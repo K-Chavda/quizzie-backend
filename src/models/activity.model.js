@@ -16,6 +16,10 @@ const optionSchema = mongoose.Schema({
   isCorrect: {
     type: Boolean,
   },
+  selectionCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const questionSchema = mongoose.Schema({
