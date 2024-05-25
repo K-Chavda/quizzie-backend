@@ -5,7 +5,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors(process.env.CORS_ORIGINS));
+app.use(cors());
 app.use(express.json());
 
 app.get("/api/v1", (req, res) => {

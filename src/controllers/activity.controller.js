@@ -122,12 +122,13 @@ const modifyActivity = async (req, res, next) => {
 };
 
 const deleteActivity = async (req, res, next) => {
-  const { activityId } = req.body;
+  const activityId = req.params.id;
 
   if (!activityId) {
     return res.status(400).json({
       success: false,
       message: "Activity ID is required",
+      activityId: req.params.id, // Should be req.params
     });
   }
 
@@ -265,8 +266,17 @@ const getSingleActivityAnalytics = async (req, res, next) => {
 };
 
 const getTrendingQuiz = async (req, res, next) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized access",
+    });
+  }
   try {
     const trendingQuiz = await Activity.aggregate([
+      { $match: { creator: new mongoose.Types.ObjectId(userId) } },
       { $sort: { impressions: -1 } },
       { $limit: 12 },
     ]);
@@ -288,6 +298,48 @@ const getTrendingQuiz = async (req, res, next) => {
   }
 };
 
+const getAllActivities = async (req, res, next) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized access",
+    });
+  }
+
+  try {
+    const activities = await Activity.find(
+      { creator: userId },
+      { title: 1, createdAt: 1, impressions: 1 }
+    );
+
+    if (activities.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No activities found",
+      });
+    }
+
+    const activity = activities.map((activity) => {
+      return {
+        _id: activity._id,
+        title: activity.title,
+        impressions: convertNumber(activity.impressions),
+        createdAt: activity.createdAt,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Activities fetched successfully",
+      data: { activity },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createActivity,
   deleteActivity,
@@ -295,4 +347,5 @@ module.exports = {
   getAnalytics,
   getSingleActivityAnalytics,
   getTrendingQuiz,
+  getAllActivities,
 };

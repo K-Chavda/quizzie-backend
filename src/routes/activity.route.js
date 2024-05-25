@@ -4,7 +4,7 @@ const activityController = require("../controllers/activity.controller");
 const verifyToken = require("../middlewares/verifyToken");
 
 router.post("/create", verifyToken, activityController.createActivity);
-router.delete("/delete", verifyToken, activityController.deleteActivity);
+router.delete("/:id", verifyToken, activityController.deleteActivity);
 router.patch("/:id", verifyToken, activityController.modifyActivity);
 router.post("/analytics", verifyToken, activityController.getAnalytics);
 router.post(
@@ -12,6 +12,7 @@ router.post(
   verifyToken,
   activityController.getSingleActivityAnalytics
 );
-router.post("/trending", activityController.getTrendingQuiz);
+router.post("/trending", verifyToken, activityController.getTrendingQuiz);
+router.post("/activities", verifyToken, activityController.getAllActivities);
 
 module.exports = router;
