@@ -200,8 +200,12 @@ const getSingleActivityAnalytics = async (req, res, next) => {
     const projection = {
       title: 1,
       activityType: 1,
+      "questions.question": 1,
+      "questions.optionType": 1,
       "questions.options.text": 1,
       "questions.options.selectionCount": 1,
+      "questions.options.imageUrl": 1,
+      "questions.options._id": 1,
       "questions.correctAnswers": 1,
       "questions.wrongAnswers": 1,
       createdAt: 1,
