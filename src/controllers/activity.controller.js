@@ -3,20 +3,24 @@ const convertNumber = require("../utils/convertNumber");
 const mongoose = require("mongoose");
 
 const getActivityData = async (req, res, next) => {
-  const activityId = req.params.id;
-  const activity = await Activity.findById(activityId);
+  try {
+    const activityId = req.params.id;
+    const activity = await Activity.findById(activityId);
 
-  if (!activity) {
-    return res.status(404).json({
-      success: false,
-      message: "Activity not found",
+    if (!activity) {
+      return res.status(404).json({
+        success: false,
+        message: "Activity not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: activity,
     });
+  } catch (error) {
+    next(error);
   }
-
-  return res.status(200).json({
-    success: true,
-    data: activity,
-  });
 };
 
 const createActivity = async (req, res, next) => {
@@ -44,10 +48,7 @@ const createActivity = async (req, res, next) => {
       data: activity,
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 
@@ -59,7 +60,13 @@ const modifyActivity = async (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: "Activity ID is required",
-      data: activityId,
+    });
+  }
+
+  if (!title || !activityType) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide all the required fields",
     });
   }
 
@@ -94,7 +101,6 @@ const deleteActivity = async (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: "Activity ID is required",
-      activityId: req.params.id,
     });
   }
 
@@ -223,7 +229,6 @@ const getSingleActivityAnalytics = async (req, res, next) => {
       });
     }
 
-    // Calculate the total of correct and wrong answers for each question
     const totalAnswers = activityAnalytics.questions.map((question) => {
       return {
         ...question._doc,
@@ -255,6 +260,7 @@ const getTrendingQuiz = async (req, res, next) => {
       message: "Unauthorized access",
     });
   }
+
   try {
     const trendingQuiz = await Activity.aggregate([
       { $match: { creator: new mongoose.Types.ObjectId(userId) } },
@@ -284,7 +290,6 @@ const getTrendingQuiz = async (req, res, next) => {
       });
     }
 
-    // Format the totalImpressions using convertNumber()
     const formattedTrendingQuiz = trendingQuiz.map((activity) => ({
       ...activity,
       totalImpressions: convertNumber(activity.totalImpressions),
@@ -385,6 +390,55 @@ const increaseQuestionImpression = async (req, res, next) => {
   }
 };
 
+const increaseOptionSelectionCount = async (req, res, next) => {
+  try {
+    const { id: activityId, questionId, optionId } = req.params;
+    const activity = await Activity.findById(activityId);
+
+    if (!activity) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid activity",
+      });
+    }
+
+    const question = activity.questions.find((question) =>
+      question._id.equals(questionId)
+    );
+
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: "Question not found",
+      });
+    }
+
+    const option = question.options.find((option) =>
+      option._id.equals(optionId)
+    );
+
+    if (!option) {
+      return res.status(404).json({
+        success: false,
+        message: "Option not found",
+      });
+    }
+
+    option.selectionCount++;
+    await activity.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Option Selection count increased successfully",
+      data: {
+        impressions: question.impressions,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const increaseAnswerCount = async (req, res, next) => {
   try {
     const { id: activityId, questionId, type } = req.params;
@@ -443,5 +497,6 @@ module.exports = {
   getTrendingQuiz,
   getAllActivities,
   increaseQuestionImpression,
+  increaseOptionSelectionCount,
   increaseAnswerCount,
 };
