@@ -120,15 +120,13 @@ const loginUser = async (req, res, next) => {
     success: true,
     message: "User Logged In Successfully",
     token,
-    data: [
-      {
-        id: userDetails._id,
-        name: userDetails.name,
-        email: userDetails.email,
-        createdAt: userDetails.createdAt,
-        updatedAt: userDetails.updatedAt,
-      },
-    ],
+    data: {
+      id: userDetails._id,
+      name: userDetails.name,
+      email: userDetails.email,
+      createdAt: userDetails.createdAt,
+      updatedAt: userDetails.updatedAt,
+    },
   });
 };
 

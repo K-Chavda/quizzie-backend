@@ -159,8 +159,8 @@ const getAnalytics = async (req, res, next) => {
     const [analytics] = await Activity.aggregate(agg);
 
     if (!analytics) {
-      return res.status(404).json({
-        success: false,
+      return res.status(200).json({
+        success: true,
         message: "No activities found",
       });
     }
@@ -197,8 +197,8 @@ const getSingleActivityAnalytics = async (req, res, next) => {
     });
 
     if (!validActivity) {
-      return res.status(404).json({
-        success: false,
+      return res.status(200).json({
+        success: true,
         message: "No activities found",
       });
     }
@@ -284,8 +284,8 @@ const getTrendingQuiz = async (req, res, next) => {
     ]);
 
     if (trendingQuiz.length === 0) {
-      return res.status(404).json({
-        success: false,
+      return res.status(200).json({
+        success: true,
         message: "No activities found",
       });
     }
@@ -322,8 +322,8 @@ const getAllActivities = async (req, res, next) => {
     );
 
     if (activities.length === 0) {
-      return res.status(404).json({
-        success: false,
+      return res.status(200).json({
+        success: true,
         message: "No activities found",
       });
     }
