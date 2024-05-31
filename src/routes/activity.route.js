@@ -3,7 +3,7 @@ const router = express.Router();
 const activityController = require("../controllers/activity.controller");
 const verifyToken = require("../middlewares/verifyToken");
 
-router.get("/:id", verifyToken, activityController.getActivityData);
+router.get("/:id", activityController.getActivityData);
 router.post("/create", verifyToken, activityController.createActivity);
 router.delete("/:id", verifyToken, activityController.deleteActivity);
 router.patch("/:id", verifyToken, activityController.modifyActivity);
