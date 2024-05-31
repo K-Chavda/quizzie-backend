@@ -17,17 +17,14 @@ router.post("/trending", verifyToken, activityController.getTrendingQuiz);
 router.post("/activities", verifyToken, activityController.getAllActivities);
 router.put(
   "/activities/:id/questions/:questionId/increase-impression",
-  verifyToken,
   activityController.increaseQuestionImpression
 );
 router.put(
   "/activities/:id/questions/:questionId/option/:optionId/increase-selection-count",
-  verifyToken,
   activityController.increaseOptionSelectionCount
 );
 router.put(
   "/activities/:id/questions/:questionId/increase-answer-count/:type",
-  verifyToken,
   activityController.increaseAnswerCount
 );
 
